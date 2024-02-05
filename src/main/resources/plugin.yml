@@ -1,0 +1,4 @@
+name: CoordinateLog
+version: '${version}'
+main: xyz.mlhmz.mcserverinformation.coordinatelog.CoordinateLog
+api-version: '1.20'
