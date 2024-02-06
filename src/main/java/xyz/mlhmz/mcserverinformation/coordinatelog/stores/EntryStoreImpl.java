@@ -1,4 +1,4 @@
-package xyz.mlhmz.mcserverinformation.coordinatelog.services;
+package xyz.mlhmz.mcserverinformation.coordinatelog.stores;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,14 +9,20 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class EntryServiceImpl {
+public class EntryStoreImpl {
     public static final String LOGS_ENTRIES_KEY = "logsentries";
     public static final String SEPARATOR = ".";
     public static final String LOGS_KEY = "logs";
-    CoordinateLog plugin;
+    public static final String INDEX_FIELD_KEY = "index";
+    public static final String TITLE_FIELD_KEY = "title";
+    public static final String PLAYER_FIELD_KEY = "player";
+    public static final String LOCATION_FIELD_KEY = "location";
+    private final CoordinateLog plugin;
+    private final PlayerCountStore countStore;
 
-    public EntryServiceImpl(CoordinateLog plugin) {
+    public EntryStoreImpl(CoordinateLog plugin) {
         this.plugin = plugin;
+        countStore = CoordinateLog.getInstance(PlayerCountStore.class);
     }
 
     public void saveEntry(Entry entry) {
@@ -26,9 +32,11 @@ public class EntryServiceImpl {
         if (!entryExisting) {
             config.getStringList(LOGS_KEY).add(entry.getTitle());
             ConfigurationSection section = config.createSection(LOGS_ENTRIES_KEY + SEPARATOR + entry.getTitle());
-            section.set("title", entry.getTitle());
-            section.set("player", entry.getPlayer().toString());
-            section.set("location", entry.getLocation());
+            UUID playerUUID = entry.getPlayer();
+            section.set(INDEX_FIELD_KEY, countStore.incrementAndGetCount(playerUUID));
+            section.set(TITLE_FIELD_KEY, entry.getTitle());
+            section.set(PLAYER_FIELD_KEY, playerUUID.toString());
+            section.set(LOCATION_FIELD_KEY, entry.getLocation());
         }
         plugin.saveConfig();
     }
@@ -46,6 +54,10 @@ public class EntryServiceImpl {
 
     private Entry getEntryFromConfig(FileConfiguration config, String title) {
         ConfigurationSection configurationSection = config.getConfigurationSection(LOGS_ENTRIES_KEY + SEPARATOR + title);
-        return new Entry(configurationSection.getString("title"), UUID.fromString(configurationSection.getString("player")), configurationSection.getLocation("location"));
+        return new Entry(
+                configurationSection.getLong(INDEX_FIELD_KEY),
+                configurationSection.getString(TITLE_FIELD_KEY),
+                UUID.fromString(configurationSection.getString(PLAYER_FIELD_KEY)),
+                configurationSection.getLocation(LOCATION_FIELD_KEY));
     }
 }

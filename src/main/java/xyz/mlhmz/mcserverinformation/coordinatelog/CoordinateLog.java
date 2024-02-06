@@ -1,8 +1,10 @@
 package xyz.mlhmz.mcserverinformation.coordinatelog;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.mlhmz.mcserverinformation.coordinatelog.services.EntryService;
-import xyz.mlhmz.mcserverinformation.coordinatelog.services.EntryServiceImpl;
+import xyz.mlhmz.mcserverinformation.coordinatelog.stores.EntryStore;
+import xyz.mlhmz.mcserverinformation.coordinatelog.stores.EntryStoreImpl;
+import xyz.mlhmz.mcserverinformation.coordinatelog.stores.PlayerCountStore;
+import xyz.mlhmz.mcserverinformation.coordinatelog.stores.PlayerCountStoreImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +19,8 @@ public final class CoordinateLog extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        instances.put(EntryService.class, new EntryServiceImpl(this));
+        instances.put(PlayerCountStore.class, new PlayerCountStoreImpl(this));
+        instances.put(EntryStore.class, new EntryStoreImpl(this));
     }
 
     @Override
