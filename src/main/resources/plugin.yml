@@ -2,3 +2,8 @@ name: CoordinateLog
 version: '${version}'
 main: xyz.mlhmz.mcserverinformation.coordinatelog.CoordinateLog
 api-version: '1.20'
+
+commands:
+  clog:
+    description: The command to use the log
+    aliases: log

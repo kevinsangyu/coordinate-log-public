@@ -41,11 +41,13 @@ public class EntryStoreImpl {
         plugin.saveConfig();
     }
 
+    // by index
     public Entry loadEntry(String title) {
         FileConfiguration config = plugin.getConfig();
         return getEntryFromConfig(config, title);
     }
 
+    // TODO: only from players
     public List<Entry> loadEntries() {
         FileConfiguration config = plugin.getConfig();
         List<String> logsList = config.getStringList(LOGS_KEY);
