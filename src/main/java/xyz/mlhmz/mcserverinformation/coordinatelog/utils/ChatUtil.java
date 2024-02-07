@@ -19,7 +19,7 @@ public class ChatUtil {
     }
 
     public static String translateAndPrettyPrintEntry(Entry entry) {
-        return ChatUtil.translateWithoutPrefix(String.format("&a%d &7- &2%s - &7X: &a%d&7, &7Y: %d&7, &7Z: %d&7 - World: &a%s",
+        return ChatUtil.translateWithoutPrefix(String.format("&a%d &7- &2%s&7: X: &a%d&7, Y: &a%d&7, Z: &a%d&7 - World: &a%s",
                 entry.getIndex(),
                 entry.getTitle(),
                 entry.getLocation().getBlockX(),

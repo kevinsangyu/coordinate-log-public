@@ -58,7 +58,7 @@ public class LogCommand implements CommandExecutor {
         location.ifPresentOrElse(
                 object -> entryStore.saveEntry(new Entry(args[1], player.getUniqueId(), object)),
                 // TODO: color?
-                () -> player.sendMessage("Wrong usage: Use /{} add <identifier> or /{} add <identifier> <x> <y> <z>".replace("{}", label))
+                () -> player.sendMessage(ChatUtil.translate("Wrong usage: Use /{} add <identifier> or /{} add <identifier> <x> <y> <z>".replace("{}", label)))
         );
     }
 

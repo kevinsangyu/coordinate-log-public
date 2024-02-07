@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class EntryStoreImpl implements EntryStore {
     public static final String LOGS_ENTRIES_KEY = "logsentries";
@@ -61,7 +60,7 @@ public class EntryStoreImpl implements EntryStore {
     public List<Entry> loadEntries(Player player) {
         FileConfiguration config = plugin.getConfig();
         List<Long> logsList = config.getLongList(PLAYER_LOGS + SEPARATOR + player.getUniqueId() + SEPARATOR + LOGS_KEY);
-        return logsList.stream().map(index -> getEntryFromConfig(config, player.getUniqueId(), index)).collect(Collectors.toList());
+        return logsList.stream().map(index -> getEntryFromConfig(config, player.getUniqueId(), index)).toList();
     }
 
     private Entry getEntryFromConfig(FileConfiguration config, UUID uuid, Long index) {
