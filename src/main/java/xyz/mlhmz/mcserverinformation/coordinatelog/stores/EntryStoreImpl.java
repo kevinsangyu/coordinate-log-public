@@ -30,7 +30,7 @@ public class EntryStoreImpl implements EntryStore {
         countStore = CoordinateLog.getInstance(PlayerCountStore.class);
     }
 
-    public void saveEntry(Entry entry) {
+    public Entry saveEntry(Entry entry) {
         FileConfiguration config = plugin.getConfig();
 
         String playerSectionPath = PLAYER_LOGS + SEPARATOR + entry.getPlayer();
@@ -40,6 +40,7 @@ public class EntryStoreImpl implements EntryStore {
         // Get player and index
         UUID player = entry.getPlayer();
         long index = countStore.incrementAndGetCount(player);
+        entry.setIndex(index);
 
         // Persist index into long list, use set to avoid duplications
         Set<Long> logs = new HashSet<>(section.getLongList(LOGS_KEY));
@@ -54,6 +55,8 @@ public class EntryStoreImpl implements EntryStore {
         entrySection.set(LOCATION_FIELD_KEY, entry.getLocation());
 
         plugin.saveConfig();
+
+        return entry;
     }
 
 

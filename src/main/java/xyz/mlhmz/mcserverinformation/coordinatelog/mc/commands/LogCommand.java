@@ -56,7 +56,23 @@ public class LogCommand implements CommandExecutor {
             location = parseCoordinateInput(player, args);
         }
         location.ifPresentOrElse(
-                object -> entryStore.saveEntry(new Entry(args[1], player.getUniqueId(), object)),
+                object -> {
+                    Entry entry = entryStore.saveEntry(new Entry(args[1], player.getUniqueId(), object));
+                    Location entryLocation = entry.getLocation();
+                    player.sendMessage(
+                            ChatUtil.translate(
+                                    String.format(
+                                            "Entry &a%s&7 added with the index &a%d&7 at X: &a%d&7 Y: &a%d&7 Z: &a%d&7 in World &a%s&7",
+                                            entry.getTitle(),
+                                            entry.getIndex(),
+                                            entryLocation.getBlockX(),
+                                            entryLocation.getBlockY(),
+                                            entryLocation.getBlockZ(),
+                                            entryLocation.getWorld().getName()
+                                    )
+                            )
+                    );
+                },
                 // TODO: color?
                 () -> player.sendMessage(ChatUtil.translate("Wrong usage: Use /{} add <identifier> or /{} add <identifier> <x> <y> <z>".replace("{}", label)))
         );
