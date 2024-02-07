@@ -12,8 +12,8 @@ import java.util.UUID;
 public class PlayerCountStoreImpl implements PlayerCountStore {
     public static final String COUNTS_SECTION_KEY = "counts";
     public static final String SEPARATOR = ".";
-    public static final String PLAYER_FIELD_KEY = "player";
     public static final String COUNT_FIELD_KEY = "count";
+    public static final String COUNT_PLAYERS_FIELD_KEY = "countPlayers";
     private final CoordinateLog plugin;
 
     public PlayerCountStoreImpl(CoordinateLog plugin) {
@@ -23,23 +23,20 @@ public class PlayerCountStoreImpl implements PlayerCountStore {
     @Override
     public long incrementAndGetCount(UUID player) {
         FileConfiguration config = plugin.getConfig();
-        Set<String> countPlayers = new HashSet<>(plugin.getConfig().getStringList("countPlayers"));
+        Set<String> countPlayers = new HashSet<>(plugin.getConfig().getStringList(COUNT_PLAYERS_FIELD_KEY));
         boolean entryNew = countPlayers.add(player.toString());
+        config.set(COUNT_PLAYERS_FIELD_KEY, countPlayers.stream().toList());
         PlayerCount playerCount;
         String path = COUNTS_SECTION_KEY + SEPARATOR + player;
         if (entryNew) {
             ConfigurationSection section = config.createSection(path);
-            section.set(PLAYER_FIELD_KEY, player.toString());
-            section.set(COUNT_FIELD_KEY, 1);
-            playerCount = new PlayerCount(player, 1);
+            section.set(COUNT_FIELD_KEY, 1L);
+            playerCount = new PlayerCount(player, 1L);
         } else {
             ConfigurationSection section = config.getConfigurationSection(path);
-            long count = section.getLong(COUNT_FIELD_KEY);
-            playerCount = new PlayerCount(
-                    UUID.fromString(section.getString(PLAYER_FIELD_KEY)),
-                    count++
-            );
-            config.set(path + SEPARATOR + COUNT_FIELD_KEY, count);
+            long count = section.getLong(COUNT_FIELD_KEY) + 1;
+            playerCount = new PlayerCount(player, count);
+            section.set(COUNT_FIELD_KEY, count);
         }
         plugin.saveConfig();
         return playerCount.getCount();
