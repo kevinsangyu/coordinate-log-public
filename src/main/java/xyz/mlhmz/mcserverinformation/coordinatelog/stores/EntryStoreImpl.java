@@ -30,26 +30,30 @@ public class EntryStoreImpl implements EntryStore {
         String playerSectionPath = PLAYER_LOGS + SEPARATOR + entry.getPlayer();
 
         ConfigurationSection section = ConfigUtil.getOrCreateSection(config, playerSectionPath);
+        long index = getIndexAndApplyIntoEntry(entry);
+        persistIndexIntoDuplicationAvoidanceSet(section, index);
+        persistDataIntoEntriesSection(entry, section, index);
+        plugin.saveConfig();
+        return entry;
+    }
 
-        // Get player and index
+    private long getIndexAndApplyIntoEntry(Entry entry) {
         UUID player = entry.getPlayer();
         long index = countStore.incrementAndGetCount(player);
         entry.setIndex(index);
+        return index;
+    }
 
-        // Persist index into long list, use set to avoid duplications
+    private void persistIndexIntoDuplicationAvoidanceSet(ConfigurationSection section, long index) {
         Set<Long> logs = new HashSet<>(section.getLongList(LOGS_KEY));
         logs.add(index);
         section.set(LOGS_KEY, logs.stream().toList());
+    }
 
-        // Persist data into section
+    private void persistDataIntoEntriesSection(Entry entry, ConfigurationSection section, long index) {
         ConfigurationSection entries = ConfigUtil.getOrCreateSection(section, ENTRIES_FIELD_KEY);
-
         entry.setIndex(index);
         entries.set(Long.toString(index), entry);
-
-        plugin.saveConfig();
-
-        return entry;
     }
 
 
