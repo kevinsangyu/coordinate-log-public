@@ -16,6 +16,6 @@ public class CoordinateEventListener implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        entryStore.saveEntry(new Entry("Died", event.getEntity().getUniqueId(), event.getEntity().getLocation()));
+        entryStore.saveEntry(new Entry("Death at", event.getEntity().getUniqueId(), event.getEntity().getLocation()));
     }
 }
