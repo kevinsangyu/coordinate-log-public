@@ -11,13 +11,8 @@ import xyz.mlhmz.mcserverinformation.coordinatelog.utils.ConfigUtil;
 import java.util.*;
 
 public class EntryStoreImpl implements EntryStore {
-    public static final String LOGS_ENTRIES_KEY = "logsentries";
     public static final String SEPARATOR = ".";
     public static final String LOGS_KEY = "logs";
-    public static final String INDEX_FIELD_KEY = "index";
-    public static final String TITLE_FIELD_KEY = "title";
-    public static final String PLAYER_FIELD_KEY = "player";
-    public static final String LOCATION_FIELD_KEY = "location";
     public static final String PLAYER_LOGS = "playerLogs";
     public static final String ENTRIES_FIELD_KEY = "entries";
     public static final int PAGINATION_SIZE = 5;
@@ -47,11 +42,10 @@ public class EntryStoreImpl implements EntryStore {
         section.set(LOGS_KEY, logs.stream().toList());
 
         // Persist data into section
-        ConfigurationSection entrySection = ConfigUtil.getOrCreateSection(section, ENTRIES_FIELD_KEY + SEPARATOR + index);
-        entrySection.set(INDEX_FIELD_KEY, index);
-        entrySection.set(TITLE_FIELD_KEY, entry.getTitle());
-        entrySection.set(PLAYER_FIELD_KEY, player.toString());
-        entrySection.set(LOCATION_FIELD_KEY, entry.getLocation());
+        ConfigurationSection entries = ConfigUtil.getOrCreateSection(section, ENTRIES_FIELD_KEY);
+
+        entry.setIndex(index);
+        entries.set(Long.toString(index), entry);
 
         plugin.saveConfig();
 
@@ -70,13 +64,9 @@ public class EntryStoreImpl implements EntryStore {
     }
 
     private Entry getEntryFromConfig(FileConfiguration config, UUID uuid, Long index) {
-        ConfigurationSection configurationSection = config.getConfigurationSection(
-                String.join(SEPARATOR, PLAYER_LOGS, uuid.toString(), ENTRIES_FIELD_KEY, Long.toString(index)
+        ConfigurationSection configurationSection = ConfigUtil.getOrCreateSection(config,
+                String.join(SEPARATOR, PLAYER_LOGS, uuid.toString(), ENTRIES_FIELD_KEY
                 ));
-        return new Entry(
-                configurationSection.getLong(INDEX_FIELD_KEY),
-                configurationSection.getString(TITLE_FIELD_KEY),
-                UUID.fromString(configurationSection.getString(PLAYER_FIELD_KEY)),
-                configurationSection.getLocation(LOCATION_FIELD_KEY));
+        return (Entry) configurationSection.get(Long.toString(index));
     }
 }
