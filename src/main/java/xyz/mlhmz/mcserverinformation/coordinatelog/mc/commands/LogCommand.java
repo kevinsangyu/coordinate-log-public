@@ -1,5 +1,6 @@
 package xyz.mlhmz.mcserverinformation.coordinatelog.mc.commands;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -8,9 +9,9 @@ import org.bukkit.entity.Player;
 import xyz.mlhmz.mcserverinformation.coordinatelog.CoordinateLog;
 import xyz.mlhmz.mcserverinformation.coordinatelog.entities.Entry;
 import xyz.mlhmz.mcserverinformation.coordinatelog.stores.EntryStore;
+import xyz.mlhmz.mcserverinformation.coordinatelog.stores.objects.Page;
 import xyz.mlhmz.mcserverinformation.coordinatelog.utils.ChatUtil;
 
-import java.util.List;
 import java.util.Optional;
 
 import static xyz.mlhmz.mcserverinformation.coordinatelog.utils.LocationUtil.*;
@@ -33,7 +34,7 @@ public class LogCommand implements CommandExecutor {
         EntryStore entryStore = CoordinateLog.getInstance(EntryStore.class);
         switch (args[0]) {
             case "add" -> addEntry(player, args, entryStore, label);
-            case "list" -> listEntries(player, entryStore);
+            case "list" -> listEntries(player, entryStore, args);
             case "remove" -> removeEntry(player, args, entryStore, label);
             default -> {
                 sendWrongUsageMessage(commandSender, label);
@@ -73,7 +74,6 @@ public class LogCommand implements CommandExecutor {
                             )
                     );
                 },
-                // TODO: color?
                 () -> player.sendMessage(ChatUtil.translate("Wrong usage: Use /{} add <identifier> or /{} add <identifier> <x> <y> <z>".replace("{}", label)))
         );
     }
@@ -89,10 +89,15 @@ public class LogCommand implements CommandExecutor {
         }
     }
 
-    private void listEntries(Player player, EntryStore entryStore) {
-        player.sendMessage(ChatUtil.translateWithoutPrefix("&a&bList of entries&7:"));
-        List<Entry> entries = entryStore.loadEntries(player);
-        entries.forEach(entry -> player.sendMessage(ChatUtil.translateAndPrettyPrintEntry(entry)));
+    private void listEntries(Player player, EntryStore entryStore, String[] args) {
+        Page<Entry> entries;
+        if (args.length >= 2 && StringUtils.isNumeric(args[1])) {
+            entries = entryStore.loadEntries(player, Integer.parseInt(args[1]));
+        } else {
+            entries = entryStore.loadEntries(player, 1);
+        }
+        player.sendMessage(ChatUtil.translateWithoutPrefix(String.format("&7List of entries &a%d/&a%d:", entries.getPageNumber(), entries.getAllPages())));
+        entries.getEntries().forEach(entry -> player.sendMessage(ChatUtil.translateAndPrettyPrintEntry(entry)));
     }
 
     private void sendWrongUsageMessage(CommandSender commandSender, String label) {

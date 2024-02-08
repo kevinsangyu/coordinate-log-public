@@ -2,11 +2,10 @@ package xyz.mlhmz.mcserverinformation.coordinatelog.stores;
 
 import org.bukkit.entity.Player;
 import xyz.mlhmz.mcserverinformation.coordinatelog.entities.Entry;
-
-import java.util.List;
+import xyz.mlhmz.mcserverinformation.coordinatelog.stores.objects.Page;
 
 public interface EntryStore {
     Entry saveEntry(Entry entry);
 
-    List<Entry> loadEntries(Player player);
+    Page<Entry> loadEntries(Player player, int page);
 }
