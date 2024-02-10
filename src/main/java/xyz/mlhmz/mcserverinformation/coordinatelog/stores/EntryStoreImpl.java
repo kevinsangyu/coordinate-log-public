@@ -27,9 +27,7 @@ public class EntryStoreImpl implements EntryStore {
     public Entry saveEntry(Entry entry) {
         FileConfiguration config = plugin.getConfig();
 
-        String playerSectionPath = PLAYER_LOGS + SEPARATOR + entry.getPlayer();
-
-        ConfigurationSection section = ConfigUtil.getOrCreateSection(config, playerSectionPath);
+        ConfigurationSection section = getPlayersSection(config, entry.getPlayer());
         long index = getIndexAndApplyIntoEntry(entry);
         persistIndexIntoDuplicationAvoidanceSet(section, index);
         persistDataIntoEntriesSection(entry, section, index);
@@ -59,12 +57,39 @@ public class EntryStoreImpl implements EntryStore {
 
     public Page<Entry> loadEntries(Player player, int page) {
         FileConfiguration config = plugin.getConfig();
-        List<Long> logsList = config.getLongList(PLAYER_LOGS + SEPARATOR + player.getUniqueId() + SEPARATOR + LOGS_KEY);
+        List<Long> logsList = getPlayersLogsList(config, player.getUniqueId());
         List<Entry> entries = logsList.stream()
                 .map(index -> getEntryFromConfig(config, player.getUniqueId(), index))
                 .sorted(Comparator.comparingLong(Entry::getIndex).reversed())
                 .toList();
         return Page.of(entries, page, PAGINATION_SIZE);
+    }
+
+    @Override
+    public boolean deleteEntry(Player player, long index) {
+        FileConfiguration config = plugin.getConfig();
+        List<Long> logsList = getPlayersLogsList(config, player.getUniqueId());
+        Optional<Long> result = logsList.stream().filter(entry -> entry == index).findFirst();
+        if (result.isPresent()) {
+            ConfigurationSection playersSection = getPlayersSection(config, player.getUniqueId());
+            ConfigurationSection entries = ConfigUtil.getOrCreateSection(playersSection, ENTRIES_FIELD_KEY);
+            entries.set(Long.toString(index), null);
+            List<Long> filteredList = logsList.stream().filter(entry -> entry != index).toList();
+            playersSection.set(LOGS_KEY, filteredList);
+            plugin.saveConfig();
+            return true;
+        }
+        return false;
+    }
+
+    private List<Long> getPlayersLogsList(FileConfiguration config, UUID player) {
+        ConfigurationSection playersSection = getPlayersSection(config, player);
+        return playersSection.getLongList(LOGS_KEY);
+    }
+
+    private static ConfigurationSection getPlayersSection(FileConfiguration config, UUID player) {
+        String playerSectionPath = PLAYER_LOGS + SEPARATOR + player;
+        return ConfigUtil.getOrCreateSection(config, playerSectionPath);
     }
 
     private Entry getEntryFromConfig(FileConfiguration config, UUID uuid, Long index) {

@@ -8,4 +8,6 @@ public interface EntryStore {
     Entry saveEntry(Entry entry);
 
     Page<Entry> loadEntries(Player player, int page);
+
+    boolean deleteEntry(Player player, long index);
 }

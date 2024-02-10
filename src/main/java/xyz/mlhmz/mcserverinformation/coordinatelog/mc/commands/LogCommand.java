@@ -1,5 +1,6 @@
 package xyz.mlhmz.mcserverinformation.coordinatelog.mc.commands;
 
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -17,16 +18,15 @@ import java.util.Optional;
 import static xyz.mlhmz.mcserverinformation.coordinatelog.utils.LocationUtil.*;
 
 public class LogCommand implements CommandExecutor {
-
-
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+    public boolean onCommand(
+            @NonNull CommandSender commandSender, @NonNull Command command, @NonNull String label, @NonNull String @NonNull[] args) {
         if (!(commandSender instanceof Player player)) {
             commandSender.sendMessage("Only players are allowed to execute this command!");
             return true;
         }
 
-        if (args == null || args.length == 0) {
+        if (args.length == 0) {
             sendWrongUsageMessage(commandSender, label);
             return false;
         }
@@ -45,8 +45,13 @@ public class LogCommand implements CommandExecutor {
     }
 
     private void removeEntry(Player player, String[] args, EntryStore entryStore, String label) {
-        // TODO: Build this feature
-        player.sendMessage(ChatUtil.translate("This operation is not supported yet..."));
+        if (args.length >= 2 && StringUtils.isNumeric(args[1])) {
+            int index = Integer.parseInt(args[1]);
+            boolean success = entryStore.deleteEntry(player, index);
+            player.sendMessage(ChatUtil.translate(success ? String.format("The entry &a%d&7 was successfully deleted.", index) : "&cThe requested entry was not found."));
+        } else {
+            player.sendMessage("Wrong usage: Use /{} remove <index>".replace("{}", label));
+        }
     }
 
     private void addEntry(Player player, String[] args, EntryStore entryStore, String label) {
@@ -101,7 +106,6 @@ public class LogCommand implements CommandExecutor {
     }
 
     private void sendWrongUsageMessage(CommandSender commandSender, String label) {
-        // TODO: Color?
         commandSender.sendMessage(ChatUtil.translate(String.format("Wrong usage: Use /%s <add|list|remove>", label)));
     }
 }
