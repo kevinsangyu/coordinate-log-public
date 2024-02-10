@@ -9,5 +9,5 @@ public interface EntryStore {
 
     Page<Entry> loadEntries(Player player, int page);
 
-    boolean deleteEntry(Player player, long index);
+    boolean deleteEntry(Player player, int index);
 }

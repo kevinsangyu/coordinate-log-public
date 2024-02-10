@@ -20,7 +20,7 @@ public class Entry implements ConfigurationSerializable {
     public static final String PLAYER_FIELD_KEY = "player";
     public static final String LOCATION_FIELD_KEY = "location";
 
-    private long index;
+    private int index;
     @NonNull
     private String title;
     @NonNull
@@ -35,7 +35,7 @@ public class Entry implements ConfigurationSerializable {
      */
     @SuppressWarnings("unused")
     public Entry(Map<String, Object> result) {
-        this.index = (long) result.get(INDEX_FIELD_KEY);
+        this.index = (int) result.get(INDEX_FIELD_KEY);
         this.title = (String) result.get(TITLE_FIELD_KEY);
         this.player = UUID.fromString((String) result.get(PLAYER_FIELD_KEY));
         this.location = (Location) result.get(LOCATION_FIELD_KEY);

@@ -1,8 +1,10 @@
 package xyz.mlhmz.mcserverinformation.coordinatelog;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.mlhmz.mcserverinformation.coordinatelog.entities.Entry;
 import xyz.mlhmz.mcserverinformation.coordinatelog.mc.commands.LogCommand;
 import xyz.mlhmz.mcserverinformation.coordinatelog.mc.listeners.CoordinateEventListener;
 import xyz.mlhmz.mcserverinformation.coordinatelog.stores.EntryStore;
@@ -27,6 +29,11 @@ public final class CoordinateLog extends JavaPlugin {
         initializeInstancesMap();
         addCommandExecutors();
         addListeners();
+        registerSerializers();
+    }
+
+    private void registerSerializers() {
+        ConfigurationSerialization.registerClass(Entry.class, "Entry");
     }
 
     private void addListeners() {

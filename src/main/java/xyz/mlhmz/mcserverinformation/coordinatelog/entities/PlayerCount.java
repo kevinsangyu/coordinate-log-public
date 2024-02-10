@@ -9,5 +9,5 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PlayerCount {
     private UUID player;
-    private long count;
+    private int count;
 }

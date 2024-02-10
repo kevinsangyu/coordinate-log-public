@@ -21,7 +21,7 @@ public class PlayerCountStoreImpl implements PlayerCountStore {
     }
 
     @Override
-    public long incrementAndGetCount(UUID player) {
+    public int incrementAndGetCount(UUID player) {
         FileConfiguration config = plugin.getConfig();
         Set<String> countPlayers = new HashSet<>(plugin.getConfig().getStringList(COUNT_PLAYERS_FIELD_KEY));
         boolean entryNew = countPlayers.add(player.toString());
@@ -30,11 +30,11 @@ public class PlayerCountStoreImpl implements PlayerCountStore {
         String path = COUNTS_SECTION_KEY + SEPARATOR + player;
         if (entryNew) {
             ConfigurationSection section = config.createSection(path);
-            section.set(COUNT_FIELD_KEY, 1L);
-            playerCount = new PlayerCount(player, 1L);
+            section.set(COUNT_FIELD_KEY, 1);
+            playerCount = new PlayerCount(player, 1);
         } else {
             ConfigurationSection section = config.getConfigurationSection(path);
-            long count = section.getLong(COUNT_FIELD_KEY) + 1;
+            int count = section.getInt(COUNT_FIELD_KEY) + 1;
             playerCount = new PlayerCount(player, count);
             section.set(COUNT_FIELD_KEY, count);
         }
