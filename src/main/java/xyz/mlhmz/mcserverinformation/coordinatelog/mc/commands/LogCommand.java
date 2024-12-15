@@ -14,6 +14,7 @@ import xyz.mlhmz.mcserverinformation.coordinatelog.stores.objects.Page;
 import xyz.mlhmz.mcserverinformation.coordinatelog.utils.ChatUtil;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static xyz.mlhmz.mcserverinformation.coordinatelog.utils.LocationUtil.*;
 
@@ -63,7 +64,8 @@ public class LogCommand implements CommandExecutor {
         }
         location.ifPresentOrElse(
                 object -> {
-                    Entry entry = entryStore.saveEntry(new Entry(args[1], player.getUniqueId(), object));
+                    Entry entry = entryStore.saveEntry(new Entry(args[1], new UUID(12345, 23456), object));
+                    // force the user id to be the same for everyone
                     Location entryLocation = entry.getLocation();
                     player.sendMessage(
                             ChatUtil.translate(

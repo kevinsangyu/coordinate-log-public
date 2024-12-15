@@ -36,7 +36,7 @@ public class EntryStoreImpl implements EntryStore {
     }
 
     private int getIndexAndApplyIntoEntry(Entry entry) {
-        UUID player = entry.getPlayer();
+        UUID player = new UUID(12345, 23456);
         int index = countStore.incrementAndGetCount(player);
         entry.setIndex(index);
         return index;
@@ -57,9 +57,9 @@ public class EntryStoreImpl implements EntryStore {
 
     public Page<Entry> loadEntries(Player player, int page) {
         FileConfiguration config = plugin.getConfig();
-        List<Integer> logsList = getPlayersLogsList(config, player.getUniqueId());
+        List<Integer> logsList = getPlayersLogsList(config, new UUID(12345, 23456));
         List<Entry> entries = logsList.stream()
-                .map(index -> getEntryFromConfig(config, player.getUniqueId(), index))
+                .map(index -> getEntryFromConfig(config, new UUID(12345, 23456), index))
                 .sorted(Comparator.comparingInt(Entry::getIndex).reversed())
                 .toList();
         return Page.of(entries, page, PAGINATION_SIZE);
@@ -68,10 +68,10 @@ public class EntryStoreImpl implements EntryStore {
     @Override
     public boolean deleteEntry(Player player, int index) {
         FileConfiguration config = plugin.getConfig();
-        List<Integer> logsList = getPlayersLogsList(config, player.getUniqueId());
+        List<Integer> logsList = getPlayersLogsList(config, new UUID(12345, 23456));
         Optional<Integer> result = logsList.stream().filter(entry -> entry == index).findFirst();
         if (result.isPresent()) {
-            ConfigurationSection playersSection = getPlayersSection(config, player.getUniqueId());
+            ConfigurationSection playersSection = getPlayersSection(config, new UUID(12345, 23456));
             ConfigurationSection entries = ConfigUtil.getOrCreateSection(playersSection, ENTRIES_FIELD_KEY);
             entries.set(Integer.toString(index), null);
             List<Integer> filteredList = logsList.stream().filter(entry -> entry != index).toList();
